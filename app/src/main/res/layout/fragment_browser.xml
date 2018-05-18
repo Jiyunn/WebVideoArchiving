@@ -28,6 +28,7 @@
             android:id = "@+id/web"
             android:layout_width = "0dp"
             android:layout_height = "0dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:imeOptions = "actionGo"
             app:layout_constraintBottom_toBottomOf = "parent"
             app:layout_constraintEnd_toEndOf = "parent"
@@ -40,7 +41,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style = "@style/FloatingButtonBrowser"
-            android:onClick = "@{fragment::onBrowserNaviClick}"
+            android:onClick = "@{fragment::onBrowserNavigateClick}"
             android:src = "@drawable/ic_chevron_left_white_24dp"
             app:layout_constraintStart_toStartOf = "parent"
             />
@@ -50,7 +51,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style = "@style/FloatingButtonBrowser"
-            android:onClick = "@{fragment::onBrowserNaviClick}"
+            android:onClick = "@{fragment::onBrowserNavigateClick}"
             android:src = "@drawable/ic_chevron_right_white_24dp"
             app:layout_constraintStart_toEndOf = "@+id/float_browser_back"
             />
@@ -61,7 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_add_white_24dp"
-            android:onClick = "@{ (view) -> fragment.onCollectClick(view)}"
+            android:onClick = "@{ fragment::onCollectClick}"
             android:visibility = "gone"
             app:layout_constraintEnd_toEndOf = "parent"
             />

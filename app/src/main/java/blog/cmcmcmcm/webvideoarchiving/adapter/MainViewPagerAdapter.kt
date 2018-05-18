@@ -8,17 +8,17 @@ import blog.cmcmcmcm.webvideoarchiving.R
 import blog.cmcmcmcm.webvideoarchiving.fragment.ArchiveFragment
 import blog.cmcmcmcm.webvideoarchiving.fragment.BrowserFragment
 
-class MainViewPagerAdapter (fm : FragmentManager, val context: Context?) : FragmentPagerAdapter(fm) {
+class MainViewPagerAdapter(fm: FragmentManager, context: Context?) : FragmentPagerAdapter(fm) {
 
-    val tabTitles = arrayOf(context?.getString(R.string.tab_browser),             context?.getString(R.string.tab_archive))
+    val tabTitles = arrayOf(context?.getString(R.string.tab_browser), context?.getString(R.string.tab_archive))
 
     override fun getItem(position: Int): Fragment {
 
         when (position) {
-            0 -> return BrowserFragment.newInstance()
-            1 -> return ArchiveFragment.newInstance()
+            0 -> return BrowserFragment()
+            1 -> return ArchiveFragment()
         }
-        return BrowserFragment.newInstance()
+        return BrowserFragment()
     }
 
     override fun getCount(): Int {

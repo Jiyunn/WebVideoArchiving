@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android = "http://schemas.android.com/apk/res/android"
+    xmlns:app = "http://schemas.android.com/apk/res-auto"
+    >
+    
+    <data>
+        
+        <variable
+            name = "activity"
+            type = "blog.cmcmcmcm.webvideoarchiving.activity.VideoActivity"
+            />
+    </data>
+    
+    <android.support.constraint.ConstraintLayout
+        android:layout_width = "match_parent"
+        android:layout_height = "match_parent"
+        android:focusable = "true"
+        android:focusableInTouchMode = "true">
+        
+        
+        <com.google.android.exoplayer2.ui.PlayerView
+            android:id = "@+id/player_video"
+            android:layout_width = "0dp"
+            android:layout_height = "0dp"
+            app:controller_layout_id = "@layout/exo_controller_video"
+            app:layout_constraintDimensionRatio = "16:9"
+            app:layout_constraintEnd_toEndOf = "parent"
+            app:layout_constraintStart_toStartOf = "parent"
+            app:layout_constraintTop_toTopOf = "parent" />
+        
+        
+        <android.support.v7.widget.RecyclerView
+            android:id = "@+id/recycler_video_tag"
+            android:paddingTop="8dp"
+            android:layout_width = "0dp"
+            android:layout_height = "0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf = "parent"
+            app:layout_constraintStart_toStartOf = "parent"
+            app:layout_constraintTop_toBottomOf="@+id/player_video"/>
+    
+        <android.support.design.widget.FloatingActionButton
+            android:id = "@+id/float_video_add_tag"
+            style = "@style/FloatingButtonBrowser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="@{ () -> activity.onAddTagClick() }"
+            android:src="@drawable/ic_add_white_24dp"
+            app:layout_constraintEnd_toEndOf = "parent"
+            />
+
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

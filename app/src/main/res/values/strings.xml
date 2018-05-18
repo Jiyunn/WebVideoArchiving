@@ -1,6 +1,15 @@
 <resources>
-    <string name="app_name">WebVideoArchiving</string>
+    <string name = "app_name">WebVideoArchiving</string>
+    <string name = "link_dynamic">b3neb.app.goo.gl</string>
     
     <string name = "tab_browser">브라우저</string>
     <string name = "tab_archive">아카이브</string>
+    
+    <string name = "archive_list">내 비디오</string>
+    
+    <string name = "share">공유하기</string>
+    
+    <string name = "hint_input_tag">태그 입력</string>
+    
+    <string name = "share_title">[아카이빙]제가 태그 단 영상. 함께봐요!</string>
 </resources>

@@ -2,14 +2,12 @@ package blog.cmcmcmcm.webvideoarchiving.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.webkit.WebView;
 
 public class CustomWebView extends WebView{
 
     private OnScrollChangedCallback mOnScrollChangedCallback;
-    private GestureDetector gestureDetector;
 
     public CustomWebView(final Context context)
     {
