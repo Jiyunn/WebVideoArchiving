@@ -14,7 +14,8 @@
     <android.support.v7.widget.CardView
         android:layout_width = "match_parent"
         android:layout_height = "wrap_content"
-        android:minHeight="300dp"
+        android:minHeight="400dp"
+        android:padding="2dp"
         android:layout_marginBottom="50dp"
         android:background = "@android:color/black"
         >
@@ -26,7 +27,7 @@
             android:background = "@android:color/white"
             >
             
-            <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+            <com.google.android.exoplayer2.ui.PlayerView
                 android:id = "@+id/player_item_archive"
                 android:layout_width = "0dp"
                 android:layout_height = "0dp"

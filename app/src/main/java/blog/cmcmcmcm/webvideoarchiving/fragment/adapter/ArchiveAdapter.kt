@@ -3,6 +3,7 @@ package me.ljy.archiving.archive.adapter
 import android.content.Context
 import android.databinding.DataBindingUtil
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,6 +41,7 @@ class ArchiveAdapter(val context: Context?) : BaseRealmRecyclerViewAdapter<Video
     }
 
     override fun onViewDetachedFromWindow(holder: ArchiveViewHolder) {
+        Log.d("Archive", "view detached from window, video should stop")
         holder.stop()
     }
 
@@ -56,6 +58,10 @@ class ArchiveAdapter(val context: Context?) : BaseRealmRecyclerViewAdapter<Video
 
         override fun prepare() {
             playerHelper?.preparePlayer()
+        }
+
+        override fun play() {
+            playerHelper?.playVideo()
         }
 
         override fun stop() {

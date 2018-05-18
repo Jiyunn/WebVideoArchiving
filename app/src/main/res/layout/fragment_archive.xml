@@ -21,7 +21,7 @@
         layout="@layout/toolbar_archive"/>
     
     
-    <im.ene.toro.widget.Container
+    <android.support.v7.widget.RecyclerView
         android:id = "@+id/recycler_archive"
         android:layout_width = "0dp"
         android:layout_margin="10dp"

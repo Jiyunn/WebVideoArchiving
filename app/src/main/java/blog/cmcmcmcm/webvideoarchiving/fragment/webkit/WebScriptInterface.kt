@@ -1,4 +1,4 @@
-package blog.cmcmcmcm.webvideoarchiving.util
+package blog.cmcmcmcm.webvideoarchiving.fragment.webkit
 
 import android.view.View
 import android.webkit.JavascriptInterface
@@ -6,12 +6,6 @@ import android.webkit.JavascriptInterface
 class WebScriptInterface(
         val button: View){
 
-    @JavascriptInterface
-    fun showFloatingButton() {
-        if (button.visibility == View.GONE) {
-            button.visibility = View.VISIBLE
-        }
-    }
 
     @JavascriptInterface
     fun hideFloatingButton() {

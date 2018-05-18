@@ -2,17 +2,17 @@ package blog.cmcmcmcm.webvideoarchiving.fragment
 
 import android.content.Intent
 import android.databinding.DataBindingUtil
+import android.graphics.Rect
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
-import android.util.Log
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import blog.cmcmcmcm.webvideoarchiving.R
 import blog.cmcmcmcm.webvideoarchiving.activity.MainActivity
 import blog.cmcmcmcm.webvideoarchiving.activity.VideoActivity
-
 import blog.cmcmcmcm.webvideoarchiving.data.Video
 import blog.cmcmcmcm.webvideoarchiving.databinding.FragmentArchiveBinding
 import blog.cmcmcmcm.webvideoarchiving.util.RxBus.RxBus
@@ -50,12 +50,12 @@ class ArchiveFragment : Fragment() {
     private fun initRecyclerView() {
         val adapter = ArchiveAdapter(activity).apply {
             updateItems(realm.where<Video>().sort(Video::addedDate.name, Sort.DESCENDING).findAll())
+
             disposables.add(clickSubject
                     .subscribe { data ->
                         //상세정보 보는 화면으로 이동
-                        val rxBus = RxBus.getInstance() //비디오 정보 담아서 보내기.
-                        rxBus.takeBus(data)
-                        Log.d("Archive", "bus data : ${data.url}")
+                        RxBus.getInstance().takeBus(data)
+
                         startActivity(Intent(activity, VideoActivity::class.java))
                     })
         }
@@ -69,9 +69,40 @@ class ArchiveFragment : Fragment() {
             setItemViewCacheSize(20)
             isDrawingCacheEnabled = true
             drawingCacheQuality = View.DRAWING_CACHE_QUALITY_HIGH
+
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+                    val firstPosition = layoutManager.findFirstCompletelyVisibleItemPosition() //첫번째로 완전히 보이는 포지션v
+
+                    val globalVisibleRect = Rect()
+                    val itemVisibleRect = Rect()
+
+                    binding.recyclerArchive.getGlobalVisibleRect(globalVisibleRect)
+
+                    val view = layoutManager.findViewByPosition(firstPosition)
+
+                    if (view != null && view.height > 0 && view.getGlobalVisibleRect(itemVisibleRect)) {
+                        val visiblePercent =
+                                if (itemVisibleRect.bottom >= globalVisibleRect.bottom) {
+                                    val visibleHeight = globalVisibleRect.bottom - itemVisibleRect.top
+                                    Math.min(visibleHeight.toFloat() / view.height, 1f)
+                                } else {
+                                    val visibleHeight = itemVisibleRect.bottom - globalVisibleRect.top
+                                    Math.min(visibleHeight.toFloat() / view.height, 1f)
+                                }
+
+                        val viewHolder =
+                                binding.recyclerArchive.findViewHolderForAdapterPosition(firstPosition) as ArchiveAdapter.ArchiveViewHolder
+                        //90%이상 보이면 재생
+                        if (visiblePercent >= 0.9f) {
+                            viewHolder.play()
+                        } else  {
+                            viewHolder.stop()
+                        }
+                    }
+                }
+            })
         }
-
-
     }
 
     override fun onDestroy() {

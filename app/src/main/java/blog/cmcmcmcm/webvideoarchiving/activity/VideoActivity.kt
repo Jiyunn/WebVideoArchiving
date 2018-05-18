@@ -12,12 +12,12 @@ import android.util.Log
 import android.widget.EditText
 import blog.cmcmcmcm.webvideoarchiving.ArchivingApplication
 import blog.cmcmcmcm.webvideoarchiving.R
+import blog.cmcmcmcm.webvideoarchiving.activity.listener.PlayerEventListener
 import blog.cmcmcmcm.webvideoarchiving.data.Video
 import blog.cmcmcmcm.webvideoarchiving.data.addTagAsync
 import blog.cmcmcmcm.webvideoarchiving.data.getTagsByVideoId
 import blog.cmcmcmcm.webvideoarchiving.databinding.ActivityVideoBinding
 import blog.cmcmcmcm.webvideoarchiving.fragment.adapter.TagAdapter
-import blog.cmcmcmcm.webvideoarchiving.util.PlayerEventListener
 import blog.cmcmcmcm.webvideoarchiving.util.RxBus.RxBus
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayerFactory
@@ -61,6 +61,7 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
     val sharedPoint = "seek_point"
 
     val disposables: CompositeDisposable = CompositeDisposable()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -179,7 +180,6 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
                     }
                 }
     }
-
 
     //공유 인텐트 & chooser 생성
     private fun shareWithUser(shortUri:String) {

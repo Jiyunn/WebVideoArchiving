@@ -38,7 +38,7 @@ class JyPlayerHelper(val context: Context?,
         val dataSourceFactory = DefaultDataSourceFactory(context,
                 Util.getUserAgent(context, "ArchivingApplication"))
 
-        //매개변수로 받은 url을 미디어 소스로 설정 해줌.
+        //매개변수로 받은 url 을 미디어 소스로 설정 해줌.
         return ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri)
     }
 
@@ -51,12 +51,16 @@ class JyPlayerHelper(val context: Context?,
         }
     }
 
-    fun getCurrentPosition(): Long {
+    //비디오 플레이하기.
+    fun playVideo() {
         player?.let {
-            return it.currentPosition
+            it.prepare(getMediaSource(video.url))
+            it.seekTo(video.seeingPoint)
+            it.playWhenReady = true
+
         }
-        return 0L
     }
+
 
     fun stopPlayer() {
         player?.stop()

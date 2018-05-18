@@ -9,7 +9,6 @@ public class RxBus{
     private BehaviorSubject<Object> subject = BehaviorSubject.create();
 
     private RxBus() {
-
     }
 
     public static RxBus getInstance() {

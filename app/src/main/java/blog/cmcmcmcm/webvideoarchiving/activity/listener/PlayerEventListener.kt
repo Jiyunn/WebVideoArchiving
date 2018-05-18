@@ -1,4 +1,4 @@
-package blog.cmcmcmcm.webvideoarchiving.util
+package blog.cmcmcmcm.webvideoarchiving.activity.listener
 
 import blog.cmcmcmcm.webvideoarchiving.activity.VideoActivity
 import com.google.android.exoplayer2.ExoPlaybackException
@@ -6,15 +6,14 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.source.BehindLiveWindowException
 import com.google.android.exoplayer2.ui.PlayerView
 
-class PlayerEventListener(val videoAcivity: VideoActivity, val playerView: PlayerView) : Player.DefaultEventListener() {
-
+class PlayerEventListener(val activity: VideoActivity, val playerView: PlayerView) : Player.DefaultEventListener() {
 
     override fun onPlayerError(error: ExoPlaybackException?) {
         if (isBehindLiveWindow(error)) {
-            videoAcivity.clearStartPosition()
-            videoAcivity.initPlayer()
+            activity.clearStartPosition()
+            activity.initPlayer()
         } else {
-            videoAcivity.updateStartPosition()
+            activity.updateStartPosition()
         }
     }
 
@@ -33,7 +32,7 @@ class PlayerEventListener(val videoAcivity: VideoActivity, val playerView: Playe
     }
 
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-        videoAcivity.updateStartPosition()
+        activity.updateStartPosition()
 
         if (playbackState == Player.STATE_READY) {
             playerView.hideController()
