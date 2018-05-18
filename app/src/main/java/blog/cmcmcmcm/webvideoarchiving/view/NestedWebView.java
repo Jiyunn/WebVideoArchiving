@@ -33,6 +33,8 @@ public class NestedWebView extends WebView implements NestedScrollingChild{
 
     @Override
     public boolean onTouchEvent( MotionEvent ev ) {
+        requestDisallowInterceptTouchEvent(true);
+
         boolean returnValue = false;
 
         MotionEvent event = MotionEvent.obtain(ev);

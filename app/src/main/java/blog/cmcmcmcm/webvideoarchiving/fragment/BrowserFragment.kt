@@ -5,7 +5,6 @@ import android.databinding.DataBindingUtil
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
-import android.os.Message
 import android.support.v4.app.Fragment
 import android.util.Base64
 import android.util.Log
@@ -33,11 +32,6 @@ class BrowserFragment : Fragment() {
 
     var videoURL: String? = null
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_browser, container, false)
@@ -174,9 +168,6 @@ class BrowserFragment : Fragment() {
     }
 
     inner class MyWebViewClient : WebViewClient() {
-        override fun onFormResubmission(view: WebView?, dontResend: Message?, resend: Message?) {
-            super.onFormResubmission(view, dontResend, resend)
-        }
 
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
@@ -193,6 +184,7 @@ class BrowserFragment : Fragment() {
             //광고를 제외한 비디오
             if (directory.contains(".mp4") && !directory.contains("/video/")) {
                 videoURL = url
+
                 Log.d("WebView", "current url $videoURL")
                 if (!isFloatingVisible()) { //플로팅 버튼이 안보일 때.
                     setFloatingVisibility(binding.floatBrowserCollect, true)
@@ -248,7 +240,6 @@ class BrowserFragment : Fragment() {
             }
         }
     }
-
 
     override fun onDestroy() {
         super.onDestroy()

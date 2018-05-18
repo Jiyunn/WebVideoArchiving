@@ -10,6 +10,8 @@
     <string name = "share">공유하기</string>
     
     <string name = "hint_input_tag">태그 입력</string>
-    
+    <string name = "dialog_ok">확인</string>
+    <string name = "dialog_cancel">취소</string>
     <string name = "share_title">[아카이빙]제가 태그 단 영상. 함께봐요!</string>
+    
 </resources>

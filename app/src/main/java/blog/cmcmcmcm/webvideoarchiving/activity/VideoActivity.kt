@@ -12,14 +12,17 @@ import android.util.Log
 import android.widget.EditText
 import blog.cmcmcmcm.webvideoarchiving.ArchivingApplication
 import blog.cmcmcmcm.webvideoarchiving.R
-import blog.cmcmcmcm.webvideoarchiving.adapter.TagAdapter
 import blog.cmcmcmcm.webvideoarchiving.data.Video
 import blog.cmcmcmcm.webvideoarchiving.data.addTagAsync
 import blog.cmcmcmcm.webvideoarchiving.data.getTagsByVideoId
 import blog.cmcmcmcm.webvideoarchiving.databinding.ActivityVideoBinding
+import blog.cmcmcmcm.webvideoarchiving.fragment.adapter.TagAdapter
+import blog.cmcmcmcm.webvideoarchiving.util.PlayerEventListener
 import blog.cmcmcmcm.webvideoarchiving.util.RxBus.RxBus
-import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.source.BehindLiveWindowException
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.ExoPlayerFactory
+import com.google.android.exoplayer2.PlaybackPreparer
+import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
@@ -41,8 +44,8 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
 
     var player: SimpleExoPlayer? = null
     val bandWidthMeter = DefaultBandwidthMeter()
-
     lateinit var mediaDataSourceFactory: DataSource.Factory
+
     lateinit var trackSelector: DefaultTrackSelector
 
     var startPosition: Long = 0L
@@ -67,7 +70,7 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
         checkDeepLinkParameter()
         getOffBus()
 
-        mediaDataSourceFactory = buildDataSourceFactory(true)
+        mediaDataSourceFactory =  buildDataSourceFactory(true)
 
         //재생하다 종료 된 지점이 있는지 찾기
         savedInstanceState?.let {
@@ -78,6 +81,7 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
         initRecyclerView()
     }
 
+    //initialize recyclerView
     private fun initRecyclerView() {
 
         val adapter = TagAdapter().apply {
@@ -94,7 +98,6 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
             //태그 롱 클릭시 공유 하기
             disposables.add(longClickSubject.subscribe { data ->
                 setShareMessage(url, data.text, data.point)
-                Log.d("Video", "long click")
             })
         }
 
@@ -118,11 +121,11 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
         if (Intent.ACTION_VIEW == getIntent().action) {
             val uri = intent.data
 
-            val videoUrl = uri.getQueryParameter(sharedUrl)
+            val videoURL = uri.getQueryParameter(sharedUrl)
             val seekPoint = uri.getQueryParameter(sharedPoint)
 
-            if (videoUrl != null) {
-                url = videoUrl
+            if (videoURL != null) {
+                url = videoURL
             }
             if (seekPoint != null) {
                 startPosition = seekPoint.toLong()
@@ -145,10 +148,9 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
     }
 
     //공유할 영상 uri 설정
-    private fun setShareMessage(videoUrl: String?, tagMsg: String, point: Long) {
-        Log.d("Video", "set share message")
+    private fun setShareMessage(videoURL: String?, tagMsg: String, point: Long) {
         //공유 할 uri
-        val videoLink = URLEncoder.encode(videoUrl, "UTF-8")
+        val videoLink = URLEncoder.encode(videoURL, "UTF-8")
         val deepLink = "https://archive.ljy?video_url=$videoLink&seek_point=$point"
 
         shortDynamicLinkWithDomain(deepLink, videoLink, tagMsg) //메소드 호출.
@@ -169,13 +171,11 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
 
                     if (task.isSuccessful) {
                         val shortLink = task.result.shortLink
-                        val flowchartLink = task.result.previewLink
-                        Log.d("Dynamic", "WITH DOMAIN shortLink $shortLink \n previewLink $flowchartLink")
 
                         //이너클래스에서 아우터클래스의 변수 변경 불가능. 그래서 여기서 호출함.
                         shareWithUser(shortLink.toString()) //공유하는 Chooser 나타냄.
                     }else if (task.isCanceled) {
-                        Log.d("Video", "task not suc")
+                        Log.w("Dynamic", "Task is cancelled")
                     }
                 }
     }
@@ -189,7 +189,7 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
         startActivity(Intent.createChooser(intent, getString(R.string.share)))
     }
 
-    //버스에서 내리깅
+    //버스에서 데이터 가져오기
     private fun getOffBus() {
         val rxBus = RxBus.getInstance()
 
@@ -205,26 +205,27 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
     //포지션 업데이트
     override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
         updateStartPosition()
+
         outState?.putLong(keyPosition, startPosition)
         outState?.putInt(keyWindow, startWindow)
     }
 
     //시작 포지션 업데이트.
-    private fun updateStartPosition() {
+    fun updateStartPosition() {
         player?.let {
             startPosition = Math.max(0, it.currentPosition)
         }
     }
 
     //initialize player
-    private fun initPlayer() {
+     fun initPlayer() {
         if (player == null) {
             val trackSelectionFactory = AdaptiveTrackSelection.Factory(bandWidthMeter)
             trackSelector = DefaultTrackSelector(trackSelectionFactory)
 
             player = ExoPlayerFactory.newSimpleInstance(this, trackSelector)
                     .apply {
-                        addListener(PlayerEventListener())
+                        addListener(PlayerEventListener(this@VideoActivity, binding.playerVideo))
                         addAnalyticsListener(EventLogger(trackSelector))
 
                         val haveStartPosition = startWindow != C.INDEX_UNSET
@@ -256,16 +257,17 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
         player = null
     }
 
+    //태그 입력하는 다이얼로그 띄움
     fun onAddTagClick() {
         val editText = EditText(this)
 
-        val builder = AlertDialog.Builder(this)
+        AlertDialog.Builder(this)
                 .setTitle(getString(R.string.hint_input_tag))
                 .setView(editText)
-                .setPositiveButton("확인", {dialog, which ->
+                .setPositiveButton(getString(R.string.dialog_ok), { _ , _ ->
                     addTagAsync(realm, player!!.currentPosition, editText.text.toString(), video?.id)
                 })
-                .setNegativeButton("취소", null)
+                .setNegativeButton(getString(R.string.dialog_cancel), null)
                 .create()
                 .show()
     }
@@ -315,40 +317,4 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
         initPlayer()
     }
 
-
-
-    inner class PlayerEventListener : Player.DefaultEventListener() {
-        override fun onPlayerError(error: ExoPlaybackException?) {
-            if (isBehindLiveWindow(error)) {
-                clearStartPosition()
-                initPlayer()
-            } else {
-                updateStartPosition()
-            }
-        }
-
-        fun isBehindLiveWindow(error: ExoPlaybackException?): Boolean {
-            if (error?.type != ExoPlaybackException.TYPE_SOURCE) {
-                return false
-            }
-            var cause: Throwable? = error.sourceException
-            while (cause != null) {
-                if (cause is BehindLiveWindowException) {
-                    return true
-                }
-                cause = cause.cause
-            }
-            return false
-        }
-
-        override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            player?.playbackError.let {
-                updateStartPosition()
-            }
-            if (playbackState == Player.STATE_READY) {
-                binding.playerVideo.hideController()
-            }
-        }
-
-    }
 }

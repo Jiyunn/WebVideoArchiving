@@ -1,4 +1,4 @@
-package blog.cmcmcmcm.webvideoarchiving.adapter
+package blog.cmcmcmcm.webvideoarchiving.fragment.adapter
 
 import android.databinding.DataBindingUtil
 import android.support.v7.widget.RecyclerView

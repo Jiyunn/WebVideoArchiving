@@ -1,7 +1,7 @@
 $(function() {
 
     $("video").on("play", function() {
-//        App.hideFloatingButton()
+//        App.ShowFloatingButton()
     });
 
     $("video").on("ended", function() {

@@ -12,7 +12,7 @@ import android.view.ViewGroup
 import blog.cmcmcmcm.webvideoarchiving.R
 import blog.cmcmcmcm.webvideoarchiving.activity.MainActivity
 import blog.cmcmcmcm.webvideoarchiving.activity.VideoActivity
-import blog.cmcmcmcm.webvideoarchiving.adapter.ArchiveAdapter
+
 import blog.cmcmcmcm.webvideoarchiving.data.Video
 import blog.cmcmcmcm.webvideoarchiving.databinding.FragmentArchiveBinding
 import blog.cmcmcmcm.webvideoarchiving.util.RxBus.RxBus
@@ -20,6 +20,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import io.realm.Sort
 import io.realm.kotlin.where
+import me.ljy.archiving.archive.adapter.ArchiveAdapter
 
 class ArchiveFragment : Fragment() {
 
@@ -73,11 +74,10 @@ class ArchiveFragment : Fragment() {
 
     }
 
-
-override fun onDestroy() {
-    super.onDestroy()
-    binding.recyclerArchive.adapter = null
-    disposables.clear()
-    realm.close()
-}
+    override fun onDestroy() {
+        super.onDestroy()
+        binding.recyclerArchive.adapter = null
+        disposables.clear()
+        realm.close()
+    }
 }

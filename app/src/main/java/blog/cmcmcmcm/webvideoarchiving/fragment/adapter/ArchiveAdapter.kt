@@ -1,8 +1,7 @@
-package blog.cmcmcmcm.webvideoarchiving.adapter
+package me.ljy.archiving.archive.adapter
 
 import android.content.Context
 import android.databinding.DataBindingUtil
-import android.net.Uri
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -11,18 +10,14 @@ import blog.cmcmcmcm.webvideoarchiving.R
 import blog.cmcmcmcm.webvideoarchiving.common.BaseRealmRecyclerViewAdapter
 import blog.cmcmcmcm.webvideoarchiving.data.Video
 import blog.cmcmcmcm.webvideoarchiving.databinding.ItemArchiveBinding
-import im.ene.toro.ToroPlayer
-import im.ene.toro.ToroUtil
-import im.ene.toro.exoplayer.ExoPlayerViewHelper
-import im.ene.toro.media.PlaybackInfo
-import im.ene.toro.widget.Container
+import blog.cmcmcmcm.webvideoarchiving.util.player.JyPlayer
+import blog.cmcmcmcm.webvideoarchiving.util.player.JyPlayerHelper
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
 class ArchiveAdapter(val context: Context?) : BaseRealmRecyclerViewAdapter<Video, ArchiveAdapter.ArchiveViewHolder>() {
 
     val clickSubject: PublishSubject<Video> = PublishSubject.create()
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArchiveViewHolder {
         val itemView: View = LayoutInflater.from(parent.context).inflate(R.layout.item_archive, parent, false)
@@ -36,71 +31,50 @@ class ArchiveAdapter(val context: Context?) : BaseRealmRecyclerViewAdapter<Video
         video?.let {
             holder.binding?.video = it
             holder.getClickObservable(it).subscribe(clickSubject)
-
+            holder.initPlayer(it, context)
         }
     }
 
+    override fun onViewAttachedToWindow(holder: ArchiveViewHolder) {
+        holder.prepare()
+    }
+
+    override fun onViewDetachedFromWindow(holder: ArchiveViewHolder) {
+        holder.stop()
+    }
 
     //ViewHolder class
-    class ArchiveViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), ToroPlayer {
+    class ArchiveViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), JyPlayer {
 
-        var helper: ExoPlayerViewHelper? = null
         val binding: ItemArchiveBinding? = DataBindingUtil.bind(itemView)
+        var playerHelper: JyPlayerHelper? = null
 
 
-        override fun isPlaying(): Boolean {
-           helper?.let {
-               return it.isPlaying
-           }
-            return false
+        fun initPlayer(video: Video, context: Context?) { //초기화 해줌.
+            playerHelper = JyPlayerHelper(context, video, binding?.playerItemArchive)
         }
 
-        override fun getPlayerView(): View {
-          return binding!!.playerItemArchive
+        override fun prepare() {
+            playerHelper?.preparePlayer()
         }
 
-        override fun pause() {
-            if (helper !=null) helper?.pause()
-        }
-
-        override fun wantsToPlay(): Boolean {
-            return ToroUtil.visibleAreaOffset(this, itemView.parent) >= 0.85
-        }
-
-        override fun play() {
-            if (helper !=null)  helper?.play()
-        }
-
-        override fun onSettled(container: Container?) {
-
-        }
-
-        override fun getCurrentPlaybackInfo(): PlaybackInfo {
-            return helper?.latestPlaybackInfo ?: PlaybackInfo()
+        override fun stop() {
+            playerHelper?.stopPlayer()
         }
 
         override fun release() {
-            if (helper != null) {
-                helper?.release()
-                helper = null
-            }
-        }
-        override fun initialize(container: Container, playbackInfo: PlaybackInfo?) {
-            if (helper == null) {
-                helper = ExoPlayerViewHelper(this, Uri.parse(binding?.video?.url))
-            }
-            helper?.initialize(container, playbackInfo)
-        }
-
-        override fun getPlayerOrder(): Int {
-            return adapterPosition
+            playerHelper?.releasePlayer()
+            playerHelper = null
         }
 
 
         fun getClickObservable(item: Video): Observable<Video> {
             return Observable.create { emitter ->
                 itemView.setOnClickListener { _ ->
-
+                    playerHelper?.let {
+                        it.stopPlayer() //재생 중이면 플레이를 멈춤,
+                        it.preparePlayer()
+                    }
                     emitter.onNext(item)
                 }
             }
