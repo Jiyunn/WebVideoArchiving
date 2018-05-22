@@ -28,20 +28,29 @@ class BrowserFragment : Fragment() {
     var isFloatingCollectVisible = false
         set (visibility) {
             if (visibility) {
-                binding.floatBrowserCollect.visibility = View.VISIBLE
+                binding.floatBrowserCollect.show()
             } else {
-                binding.floatBrowserCollect.visibility = View.GONE
+                binding.floatBrowserCollect.hide()
             }
         }
 
     var isFloatingNaviVisible = false
         set (visibility) {
             if (visibility) {
-                binding.floatBrowserBack.visibility = View.VISIBLE
-                binding.floatBrowserForward.visibility = View.VISIBLE
+                binding.floatBrowserBack.show()
+                binding.floatBrowserForward.show()
             } else {
-                binding.floatBrowserBack.visibility = View.GONE
-                binding.floatBrowserForward.visibility = View.GONE
+                binding.floatBrowserBack.hide()
+                binding.floatBrowserForward.hide()
+            }
+        }
+
+    var isToolbarVisible = true
+        set(visibility) {
+            if (visibility) {
+                binding.toolbar?.toolbarBrowser?.visibility = View.VISIBLE
+            } else {
+                binding.toolbar?.toolbarBrowser?.visibility = View.GONE
             }
         }
 
@@ -66,12 +75,14 @@ class BrowserFragment : Fragment() {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     if (view != null) {
                         hideSoftKeyboard(context, view) //소프트 키보드 자동으로 내림.
-                        goURL(editToolbarBrowser.text.toString())
+
+                        goURL(editToolbarBrowser.text.toString()) //입력한 url주소로 이동
                     }
                 }
                 true
             }
 
+            //새로고침
             imgBtnRefresh.setOnClickListener {
                 binding.web.reload()
             }
@@ -106,11 +117,14 @@ class BrowserFragment : Fragment() {
             loadUrl(getString(R.string.default_url))
 
 
+            //플로팅 버튼 숨김, 보임 설정
             setOnScrollChangedCallback { _, t, _, oldt ->
                 if (t > oldt) {
                     isFloatingNaviVisible = false
+                    isToolbarVisible = false
                 } else if (t < oldt) {
                     isFloatingNaviVisible = true
+                    isToolbarVisible = true
                 }
             }
         }
@@ -140,6 +154,10 @@ class BrowserFragment : Fragment() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        realm.close()
+    }
 
     override fun onDestroy() {
         super.onDestroy()

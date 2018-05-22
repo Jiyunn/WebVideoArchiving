@@ -3,8 +3,7 @@ package blog.cmcmcmcm.webvideoarchiving.fragment.webkit
 import android.view.View
 import android.webkit.JavascriptInterface
 
-class WebScriptInterface(
-        val button: View){
+class WebScriptInterface(val button: View) {
 
 
     @JavascriptInterface

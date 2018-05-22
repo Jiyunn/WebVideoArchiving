@@ -8,7 +8,6 @@ import android.os.PersistableBundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.util.Log
 import android.widget.EditText
 import blog.cmcmcmcm.webvideoarchiving.ArchivingApplication
 import blog.cmcmcmcm.webvideoarchiving.R
@@ -57,7 +56,8 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
     var video: Video? = null
     var url: String? = null
 
-    val sharedUrl = "video_url" //링크 공유 혹은 접속 시 queryParameter.
+    //링크 공유 및 접속 시 필요한 query parameter.
+    val sharedUrl = "video_url"
     val sharedPoint = "seek_point"
 
     val disposables: CompositeDisposable = CompositeDisposable()
@@ -71,18 +71,16 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
         checkDeepLinkParameter()
         getOffBus()
 
-        mediaDataSourceFactory =  buildDataSourceFactory(true)
+        mediaDataSourceFactory = buildDataSourceFactory(true)
 
         //재생하다 종료 된 지점이 있는지 찾기
         savedInstanceState?.let {
             startPosition = it.getLong(keyPosition)
             startWindow = it.getInt(keyWindow)
         }
-
-        initRecyclerView()
     }
 
-    //initialize recyclerView
+
     private fun initRecyclerView() {
 
         val adapter = TagAdapter().apply {
@@ -118,10 +116,12 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
      */
     private fun checkDeepLinkParameter(): Boolean {
         val intent = intent
-        //메니피스트에 정의한 액션과 같은 액션이라면,
+
+        //Manifest 에 등록한 action
         if (Intent.ACTION_VIEW == getIntent().action) {
             val uri = intent.data
 
+            // query 에서 비디오 URL 과 재생 지점 추출
             val videoURL = uri.getQueryParameter(sharedUrl)
             val seekPoint = uri.getQueryParameter(sharedPoint)
 
@@ -137,7 +137,9 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
     }
 
 
-    //태그 포인트로 이동
+    /**
+     *  사용자가 지정한 태그 지점으로 이동.
+     */
     private fun seekToTagPoint(point: Long) {
         player?.let {
             if (point <= it.duration) {
@@ -148,17 +150,21 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
         }
     }
 
-    //공유할 영상 uri 설정
+    /**
+     * 메세지와 함께 URL 공유하는 메소드.
+     */
     private fun setShareMessage(videoURL: String?, tagMsg: String, point: Long) {
-        //공유 할 uri
+
+        //비디오 url 의 인코딩 타입 지정해줌
         val videoLink = URLEncoder.encode(videoURL, "UTF-8")
         val deepLink = "https://archive.ljy?video_url=$videoLink&seek_point=$point"
 
-        shortDynamicLinkWithDomain(deepLink, videoLink, tagMsg) //메소드 호출.
+        //다이나믹 링크로 만들어주는 메소드
+        shortDynamicLinkWithDomain(deepLink, videoLink, tagMsg)
     }
 
 
-    private fun shortDynamicLinkWithDomain(uri: String, videoLink:String, msg: String) {
+    private fun shortDynamicLinkWithDomain(uri: String, videoLink: String, msg: String) {
         FirebaseDynamicLinks.getInstance().createDynamicLink()
                 .setLink(Uri.parse(uri))
                 .setDynamicLinkDomain(getString(R.string.link_dynamic))
@@ -173,16 +179,15 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
                     if (task.isSuccessful) {
                         val shortLink = task.result.shortLink
 
-                        //이너클래스에서 아우터클래스의 변수 변경 불가능. 그래서 여기서 호출함.
-                        shareWithUser(shortLink.toString()) //공유하는 Chooser 나타냄.
-                    }else if (task.isCanceled) {
-                        Log.w("Dynamic", "Task is cancelled")
+                        //outer class 의 변수를 참조할 수 없어 여기서 호출함
+                        //공유 Chooser 보여주는 메소드
+                        shareWithUser(shortLink.toString())
                     }
                 }
     }
 
     //공유 인텐트 & chooser 생성
-    private fun shareWithUser(shortUri:String) {
+    private fun shareWithUser(shortUri: String) {
         val intent = Intent(Intent.ACTION_SEND)
                 .putExtra(Intent.EXTRA_TEXT, shortUri)
                 .setType("text/plain")
@@ -202,7 +207,7 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
                 })
     }
 
-    //포지션 업데이트
+    //기억된 시작 지점 가져오기
     override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
         updateStartPosition()
 
@@ -210,15 +215,15 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
         outState?.putInt(keyWindow, startWindow)
     }
 
-    //시작 포지션 업데이트.
+    //시작 지점 업데이트.
     fun updateStartPosition() {
         player?.let {
             startPosition = Math.max(0, it.currentPosition)
         }
     }
 
-    //initialize player
-     fun initPlayer() {
+
+    fun initPlayer() {
         if (player == null) {
             val trackSelectionFactory = AdaptiveTrackSelection.Factory(bandWidthMeter)
             trackSelector = DefaultTrackSelector(trackSelectionFactory)
@@ -235,12 +240,14 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
                         prepare(buildMediaSource(url), !haveStartPosition, false)
                     }
 
-            binding.playerVideo.requestFocus()
-            binding.playerVideo.player = player
-            binding.playerVideo.setPlaybackPreparer(this)
+            //apply 로 하면 에러남. 왜?
+            binding.playerVideo.apply {
+                requestFocus()
+                this.player = this@VideoActivity.player
+                setPlaybackPreparer(this@VideoActivity)
+            }
         }
     }
-
 
     private fun buildDataSourceFactory(useBandwidthMeter: Boolean): DataSource.Factory {
         return (application as ArchivingApplication)
@@ -264,7 +271,7 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
         AlertDialog.Builder(this)
                 .setTitle(getString(R.string.hint_input_tag))
                 .setView(editText)
-                .setPositiveButton(getString(R.string.dialog_ok), { _ , _ ->
+                .setPositiveButton(getString(R.string.dialog_ok), { _, _ ->
                     addTagAsync(realm, player!!.currentPosition, editText.text.toString(), video?.id)
                 })
                 .setNegativeButton(getString(R.string.dialog_cancel), null)
@@ -280,11 +287,15 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    private fun releaseResources() {
         releasePlayer()
         disposables.dispose()
         realm.close()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        releaseResources()
     }
 
     override fun onStart() {
@@ -292,6 +303,7 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
         if (Util.SDK_INT > 23) {
             initPlayer()
         }
+        initRecyclerView()
     }
 
     override fun onPause() {

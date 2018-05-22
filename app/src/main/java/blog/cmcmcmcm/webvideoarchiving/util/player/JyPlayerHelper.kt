@@ -1,6 +1,7 @@
 package blog.cmcmcmcm.webvideoarchiving.util.player
 
 import android.content.Context
+import android.media.session.PlaybackState
 import android.net.Uri
 import blog.cmcmcmcm.webvideoarchiving.data.Video
 import com.google.android.exoplayer2.ExoPlayerFactory
@@ -42,10 +43,9 @@ class JyPlayerHelper(val context: Context?,
         return ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri)
     }
 
-
+    //재생 준비
     fun preparePlayer() {
         player?.let {
-            it.playWhenReady = false
             it.prepare(getMediaSource(video.url))
             it.seekTo(video.seeingPoint)
         }
@@ -53,14 +53,10 @@ class JyPlayerHelper(val context: Context?,
 
     //비디오 플레이하기.
     fun playVideo() {
-        player?.let {
-            it.prepare(getMediaSource(video.url))
-            it.seekTo(video.seeingPoint)
-            it.playWhenReady = true
-
+        if (player?.playbackState == PlaybackState.STATE_PLAYING) {
+            player?.playWhenReady = true
         }
     }
-
 
     fun stopPlayer() {
         player?.stop()

@@ -3,7 +3,6 @@
     xmlns:app = "http://schemas.android.com/apk/res-auto"
     >
     
-    
     <data>
         
         <variable
@@ -12,60 +11,76 @@
             />
     </data>
     
-    
-    <android.support.constraint.ConstraintLayout
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width = "match_parent"
         android:layout_height = "match_parent"
         >
         
-        <include
-            android:id = "@+id/toolbar"
-            app:fragment="@{fragment}"
-            layout = "@layout/toolbar_browser"
-            />
+        <android.support.design.widget.AppBarLayout
+            android:layout_width = "match_parent"
+            android:layout_height = "wrap_content"
+            >
+            
+            <include
+                android:id = "@+id/toolbar"
+                layout = "@layout/toolbar_browser"
+                app:fragment = "@{fragment}"
+                app:layout_scrollFlags = "scroll|enterAlways"
+                />
         
-        <blog.cmcmcmcm.webvideoarchiving.view.CustomWebView
-            android:id = "@+id/web"
-            android:layout_width = "0dp"
-            android:layout_height = "0dp"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:imeOptions = "actionGo"
-            app:layout_constraintBottom_toBottomOf = "parent"
-            app:layout_constraintEnd_toEndOf = "parent"
-            app:layout_constraintStart_toStartOf = "parent"
-            app:layout_constraintTop_toBottomOf = "@+id/toolbar"
-            />
-    
-        <android.support.design.widget.FloatingActionButton
-            android:id = "@+id/float_browser_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style = "@style/FloatingButtonBrowser"
-            android:onClick = "@{fragment::onBrowserNavigateClick}"
-            android:src = "@drawable/ic_chevron_left_white_24dp"
-            app:layout_constraintStart_toStartOf = "parent"
-            />
+        </android.support.design.widget.AppBarLayout>
         
-        <android.support.design.widget.FloatingActionButton
-            android:id = "@+id/float_browser_forward"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style = "@style/FloatingButtonBrowser"
-            android:onClick = "@{fragment::onBrowserNavigateClick}"
-            android:src = "@drawable/ic_chevron_right_white_24dp"
-            app:layout_constraintStart_toEndOf = "@+id/float_browser_back"
-            />
+        <android.support.constraint.ConstraintLayout
+            android:layout_width = "match_parent"
+            android:layout_height = "match_parent"
+            app:layout_behavior = "@string/appbar_scrolling_view_behavior"
+            >
+            
+            <blog.cmcmcmcm.webvideoarchiving.view.CustomWebView
+                android:id = "@+id/web"
+                android:layout_width = "match_parent"
+                android:layout_height = "match_parent"
+                android:imeOptions = "actionGo"
+                app:layout_behavior = "@string/appbar_scrolling_view_behavior"
+                app:layout_constraintBottom_toBottomOf = "parent"
+                app:layout_constraintEnd_toEndOf = "parent"
+                app:layout_constraintStart_toStartOf = "parent"
+                app:layout_constraintTop_toTopOf = "parent"
+                />
+            
+            <android.support.design.widget.FloatingActionButton
+                android:id = "@+id/float_browser_back"
+                style = "@style/FloatingButtonBrowser"
+                android:layout_width = "wrap_content"
+                android:layout_height = "wrap_content"
+                android:onClick = "@{fragment::onBrowserNavigateClick}"
+                android:src = "@drawable/ic_chevron_left_white_24dp"
+                app:layout_behavior = "blog.cmcmcmcm.webvideoarchiving.view.WebFloatingBehavior"
+                app:layout_constraintStart_toStartOf = "parent"
+                />
+            
+            <android.support.design.widget.FloatingActionButton
+                android:id = "@+id/float_browser_forward"
+                style = "@style/FloatingButtonBrowser"
+                android:layout_width = "wrap_content"
+                android:layout_height = "wrap_content"
+                android:onClick = "@{fragment::onBrowserNavigateClick}"
+                android:src = "@drawable/ic_chevron_right_white_24dp"
+                app:layout_behavior = "blog.cmcmcmcm.webvideoarchiving.view.WebFloatingBehavior"
+                app:layout_constraintStart_toEndOf = "@+id/float_browser_back"
+                />
+            
+            <android.support.design.widget.FloatingActionButton
+                android:id = "@+id/float_browser_collect"
+                style = "@style/FloatingButtonBrowser"
+                android:layout_width = "wrap_content"
+                android:layout_height = "wrap_content"
+                android:onClick = "@{ () -> fragment.onCollectClick() }"
+                android:src = "@drawable/ic_add_white_24dp"
+                android:visibility = "gone"
+                app:layout_constraintEnd_toEndOf = "parent"
+                />
         
-        <android.support.design.widget.FloatingActionButton
-            android:id = "@+id/float_browser_collect"
-            style = "@style/FloatingButtonBrowser"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_add_white_24dp"
-            android:onClick = "@{ () -> fragment.onCollectClick() }"
-            android:visibility = "gone"
-            app:layout_constraintEnd_toEndOf = "parent"
-            />
-    
-    </android.support.constraint.ConstraintLayout>
+        </android.support.constraint.ConstraintLayout>
+    </android.support.design.widget.CoordinatorLayout>
 </layout>

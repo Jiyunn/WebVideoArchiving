@@ -15,19 +15,19 @@ import blog.cmcmcmcm.webvideoarchiving.activity.MainActivity
 import blog.cmcmcmcm.webvideoarchiving.activity.VideoActivity
 import blog.cmcmcmcm.webvideoarchiving.data.Video
 import blog.cmcmcmcm.webvideoarchiving.databinding.FragmentArchiveBinding
+import blog.cmcmcmcm.webvideoarchiving.fragment.adapter.ArchiveAdapter
 import blog.cmcmcmcm.webvideoarchiving.util.RxBus.RxBus
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import io.realm.Sort
 import io.realm.kotlin.where
-import me.ljy.archiving.archive.adapter.ArchiveAdapter
 
 class ArchiveFragment : Fragment() {
 
     lateinit var binding: FragmentArchiveBinding
-    val realm: Realm = Realm.getDefaultInstance()
-    val disposables: CompositeDisposable = CompositeDisposable()
+    lateinit var realm: Realm
 
+    val disposables: CompositeDisposable = CompositeDisposable()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_archive, container, false)
@@ -39,6 +39,14 @@ class ArchiveFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         initToolbar()
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        //비디오 액티비티에서 다시 돌아올 때, 정상작동을 위해 여기서 초기화.
+        realm = Realm.getDefaultInstance()
+
         initRecyclerView()
     }
 
@@ -72,43 +80,57 @@ class ArchiveFragment : Fragment() {
 
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
-                    val firstPosition = layoutManager.findFirstCompletelyVisibleItemPosition() //첫번째로 완전히 보이는 포지션v
+                    //첫번째로 보이는 아이템의 포지션 얻기
+                    val firstPosition = layoutManager.findFirstVisibleItemPosition()
 
-                    val globalVisibleRect = Rect()
-                    val itemVisibleRect = Rect()
+                        val globalVisibleRect = Rect()
+                        val itemVisibleRect = Rect()
 
-                    binding.recyclerArchive.getGlobalVisibleRect(globalVisibleRect)
+                        binding.recyclerArchive.getGlobalVisibleRect(globalVisibleRect)
 
-                    val view = layoutManager.findViewByPosition(firstPosition)
+                        val view = layoutManager.findViewByPosition(firstPosition)
 
-                    if (view != null && view.height > 0 && view.getGlobalVisibleRect(itemVisibleRect)) {
-                        val visiblePercent =
-                                if (itemVisibleRect.bottom >= globalVisibleRect.bottom) {
-                                    val visibleHeight = globalVisibleRect.bottom - itemVisibleRect.top
-                                    Math.min(visibleHeight.toFloat() / view.height, 1f)
-                                } else {
-                                    val visibleHeight = itemVisibleRect.bottom - globalVisibleRect.top
-                                    Math.min(visibleHeight.toFloat() / view.height, 1f)
-                                }
+                        if (view != null && view.height > 0 && view.getGlobalVisibleRect(itemVisibleRect)) {
+                            val visiblePercent =
+                                    if (itemVisibleRect.bottom >= globalVisibleRect.bottom) {
+                                        val visibleHeight = globalVisibleRect.bottom - itemVisibleRect.top
+                                        Math.min(visibleHeight.toFloat() / view.height, 1f)
+                                    } else {
+                                        val visibleHeight = itemVisibleRect.bottom - globalVisibleRect.top
+                                        Math.min(visibleHeight.toFloat() / view.height, 1f)
+                                    }
 
-                        val viewHolder =
-                                binding.recyclerArchive.findViewHolderForAdapterPosition(firstPosition) as ArchiveAdapter.ArchiveViewHolder
-                        //90%이상 보이면 재생
-                        if (visiblePercent >= 0.9f) {
-                            viewHolder.play()
-                        } else  {
-                            viewHolder.stop()
+                            val viewHolder =
+                                    binding.recyclerArchive.findViewHolderForAdapterPosition(firstPosition) as ArchiveAdapter.ArchiveViewHolder
+
+                            //90%이상 보이면 재생, 그렇지 않으면 멈춤.
+                            if (visiblePercent >= 0.9f) {
+                                viewHolder.play()
+                            } else  {
+                                viewHolder.stop()
+                            }
                         }
                     }
-                }
             })
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    private fun releaseResources() {
         binding.recyclerArchive.adapter = null
         disposables.clear()
         realm.close()
+    }
+
+
+    override fun onStop() {
+        super.onStop()
+
+        releaseResources()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        releaseResources()
     }
 }
