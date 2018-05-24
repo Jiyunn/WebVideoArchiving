@@ -39,7 +39,7 @@ import java.net.URLEncoder
 class VideoActivity : AppCompatActivity(), PlaybackPreparer {
 
     lateinit var binding: ActivityVideoBinding
-    val realm: Realm = Realm.getDefaultInstance()
+    var realm: Realm = Realm.getDefaultInstance()
 
     var player: SimpleExoPlayer? = null
     val bandWidthMeter = DefaultBandwidthMeter()
@@ -297,6 +297,9 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
         super.onStart()
         if (Util.SDK_INT > 23) {
             initPlayer()
+        }
+        if (realm.isClosed) {
+            realm = Realm.getDefaultInstance()
         }
         initRecyclerView()
     }

@@ -25,7 +25,7 @@ import io.realm.kotlin.where
 class ArchiveFragment : Fragment() {
 
     lateinit var binding: FragmentArchiveBinding
-    lateinit var realm: Realm
+    var realm: Realm = Realm.getDefaultInstance()
 
     val disposables: CompositeDisposable = CompositeDisposable()
 
@@ -45,8 +45,9 @@ class ArchiveFragment : Fragment() {
         super.onStart()
 
         //비디오 액티비티에서 다시 돌아올 때, 정상작동을 위해 여기서 초기화.
-        realm = Realm.getDefaultInstance()
-
+        if (realm.isClosed) {
+            realm = Realm.getDefaultInstance()
+        }
         initRecyclerView()
     }
 
