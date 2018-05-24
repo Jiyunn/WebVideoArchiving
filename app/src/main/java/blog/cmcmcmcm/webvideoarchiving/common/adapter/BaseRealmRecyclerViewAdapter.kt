@@ -1,4 +1,4 @@
-package blog.cmcmcmcm.webvideoarchiving.common
+package blog.cmcmcmcm.webvideoarchiving.common.adapter
 
 import android.support.v7.widget.RecyclerView
 import io.realm.OrderedRealmCollection

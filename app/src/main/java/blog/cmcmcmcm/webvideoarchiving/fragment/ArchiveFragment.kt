@@ -13,10 +13,10 @@ import android.view.ViewGroup
 import blog.cmcmcmcm.webvideoarchiving.R
 import blog.cmcmcmcm.webvideoarchiving.activity.MainActivity
 import blog.cmcmcmcm.webvideoarchiving.activity.VideoActivity
+import blog.cmcmcmcm.webvideoarchiving.common.rx.RxBus
 import blog.cmcmcmcm.webvideoarchiving.data.Video
 import blog.cmcmcmcm.webvideoarchiving.databinding.FragmentArchiveBinding
 import blog.cmcmcmcm.webvideoarchiving.fragment.adapter.ArchiveAdapter
-import blog.cmcmcmcm.webvideoarchiving.util.RxBus.RxBus
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import io.realm.Sort
@@ -68,7 +68,9 @@ class ArchiveFragment : Fragment() {
                     })
         }
 
-        val layoutManager = LinearLayoutManager(activity)
+        val layoutManager = LinearLayoutManager(activity).apply {
+            orientation = LinearLayoutManager.VERTICAL
+        }
 
         binding.recyclerArchive.apply {
             this.adapter = adapter
@@ -83,34 +85,34 @@ class ArchiveFragment : Fragment() {
                     //첫번째로 보이는 아이템의 포지션 얻기
                     val firstPosition = layoutManager.findFirstVisibleItemPosition()
 
-                        val globalVisibleRect = Rect()
-                        val itemVisibleRect = Rect()
+                    val globalVisibleRect = Rect()
+                    val itemVisibleRect = Rect()
 
-                        binding.recyclerArchive.getGlobalVisibleRect(globalVisibleRect)
+                    binding.recyclerArchive.getGlobalVisibleRect(globalVisibleRect)
 
-                        val view = layoutManager.findViewByPosition(firstPosition)
+                    val view = layoutManager.findViewByPosition(firstPosition)
 
-                        if (view != null && view.height > 0 && view.getGlobalVisibleRect(itemVisibleRect)) {
-                            val visiblePercent =
-                                    if (itemVisibleRect.bottom >= globalVisibleRect.bottom) {
-                                        val visibleHeight = globalVisibleRect.bottom - itemVisibleRect.top
-                                        Math.min(visibleHeight.toFloat() / view.height, 1f)
-                                    } else {
-                                        val visibleHeight = itemVisibleRect.bottom - globalVisibleRect.top
-                                        Math.min(visibleHeight.toFloat() / view.height, 1f)
-                                    }
+                    if (view != null && view.height > 0 && view.getGlobalVisibleRect(itemVisibleRect)) {
+                        val visiblePercent =
+                                if (itemVisibleRect.bottom >= globalVisibleRect.bottom) {
+                                    val visibleHeight = globalVisibleRect.bottom - itemVisibleRect.top
+                                    Math.min(visibleHeight.toFloat() / view.height, 1f)
+                                } else {
+                                    val visibleHeight = itemVisibleRect.bottom - globalVisibleRect.top
+                                    Math.min(visibleHeight.toFloat() / view.height, 1f)
+                                }
 
-                            val viewHolder =
-                                    binding.recyclerArchive.findViewHolderForAdapterPosition(firstPosition) as ArchiveAdapter.ArchiveViewHolder
+                        val viewHolder =
+                                binding.recyclerArchive.findViewHolderForAdapterPosition(firstPosition) as ArchiveAdapter.ArchiveViewHolder
 
-                            //90%이상 보이면 재생, 그렇지 않으면 멈춤.
-                            if (visiblePercent >= 0.9f) {
-                                viewHolder.play()
-                            } else  {
-                                viewHolder.stop()
-                            }
+                        //90%이상 보이면 재생, 그렇지 않으면 멈춤.
+                        if (visiblePercent >= 0.9f) {
+                            viewHolder.play()
+                        } else {
+                            viewHolder.stop()
                         }
                     }
+                }
             })
         }
     }
@@ -120,7 +122,6 @@ class ArchiveFragment : Fragment() {
         disposables.clear()
         realm.close()
     }
-
 
     override fun onStop() {
         super.onStop()

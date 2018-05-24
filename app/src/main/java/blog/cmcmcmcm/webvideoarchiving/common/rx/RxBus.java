@@ -1,4 +1,4 @@
-package blog.cmcmcmcm.webvideoarchiving.util.RxBus;
+package blog.cmcmcmcm.webvideoarchiving.common.rx;
 
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;

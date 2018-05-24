@@ -8,11 +8,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import blog.cmcmcmcm.webvideoarchiving.R
-import blog.cmcmcmcm.webvideoarchiving.common.BaseRealmRecyclerViewAdapter
+import blog.cmcmcmcm.webvideoarchiving.common.adapter.BaseRealmRecyclerViewAdapter
 import blog.cmcmcmcm.webvideoarchiving.data.Video
 import blog.cmcmcmcm.webvideoarchiving.databinding.ItemArchiveBinding
-import blog.cmcmcmcm.webvideoarchiving.util.player.JyPlayer
-import blog.cmcmcmcm.webvideoarchiving.util.player.JyPlayerHelper
+import blog.cmcmcmcm.webvideoarchiving.common.player.JyPlayer
+import blog.cmcmcmcm.webvideoarchiving.common.player.JyPlayerHelper
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 

@@ -1,4 +1,4 @@
-package blog.cmcmcmcm.webvideoarchiving.fragment.webkit
+package blog.cmcmcmcm.webvideoarchiving.common.webkit
 
 import android.webkit.WebChromeClient
 import android.webkit.WebView

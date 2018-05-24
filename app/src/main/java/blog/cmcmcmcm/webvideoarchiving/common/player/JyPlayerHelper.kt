@@ -1,4 +1,4 @@
-package blog.cmcmcmcm.webvideoarchiving.util.player
+package blog.cmcmcmcm.webvideoarchiving.common.player
 
 import android.content.Context
 import android.media.session.PlaybackState

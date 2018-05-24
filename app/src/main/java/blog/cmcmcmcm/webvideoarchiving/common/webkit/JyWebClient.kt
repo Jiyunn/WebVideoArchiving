@@ -1,4 +1,4 @@
-package blog.cmcmcmcm.webvideoarchiving.fragment.webkit
+package blog.cmcmcmcm.webvideoarchiving.common.webkit
 
 import android.annotation.TargetApi
 import android.graphics.Bitmap

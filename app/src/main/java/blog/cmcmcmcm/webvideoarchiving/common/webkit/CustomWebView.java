@@ -1,4 +1,4 @@
-package blog.cmcmcmcm.webvideoarchiving.view;
+package blog.cmcmcmcm.webvideoarchiving.common.webkit;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -7,7 +7,7 @@ import android.webkit.WebView;
 
 public class CustomWebView extends WebView{
 
-    private OnScrollChangedCallback mOnScrollChangedCallback;
+    private WebViewScrollListener mOnScrollChangedCallback;
 
     public CustomWebView(final Context context)
     {
@@ -19,8 +19,7 @@ public class CustomWebView extends WebView{
         super(context, attrs);
     }
 
-    public CustomWebView(final Context context, final AttributeSet attrs, final int defStyle)
-    {
+    public CustomWebView(final Context context, final AttributeSet attrs, final int defStyle)    {
         super(context, attrs, defStyle);
     }
 
@@ -31,27 +30,15 @@ public class CustomWebView extends WebView{
     }
 
     @Override
-    protected void onScrollChanged(final int l, final int t, final int oldl, final int oldt)
-    {
+    protected void onScrollChanged(final int l, final int t, final int oldl, final int oldt)    {
         super.onScrollChanged(l, t, oldl, oldt);
         if(mOnScrollChangedCallback != null) {
             mOnScrollChangedCallback.onScroll(l, t, oldl, oldt);
         }
     }
 
-    public OnScrollChangedCallback getOnScrollChangedCallback()
-    {
-        return mOnScrollChangedCallback;
-    }
-
-    public void setOnScrollChangedCallback(final OnScrollChangedCallback onScrollChangedCallback)
-    {
+    public void setOnScrollChangedCallback(final WebViewScrollListener onScrollChangedCallback)    {
         mOnScrollChangedCallback = onScrollChangedCallback;
     }
 
-
-    public static interface OnScrollChangedCallback
-    {
-        public void onScroll(int l, int t, int oldl, int oldt);
-    }
 }

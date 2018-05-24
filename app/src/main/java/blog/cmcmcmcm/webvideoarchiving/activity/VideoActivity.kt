@@ -12,12 +12,12 @@ import android.widget.EditText
 import blog.cmcmcmcm.webvideoarchiving.ArchivingApplication
 import blog.cmcmcmcm.webvideoarchiving.R
 import blog.cmcmcmcm.webvideoarchiving.activity.listener.PlayerEventListener
+import blog.cmcmcmcm.webvideoarchiving.common.rx.RxBus
 import blog.cmcmcmcm.webvideoarchiving.data.Video
 import blog.cmcmcmcm.webvideoarchiving.data.addTagAsync
 import blog.cmcmcmcm.webvideoarchiving.data.getTagsByVideoId
 import blog.cmcmcmcm.webvideoarchiving.databinding.ActivityVideoBinding
 import blog.cmcmcmcm.webvideoarchiving.fragment.adapter.TagAdapter
-import blog.cmcmcmcm.webvideoarchiving.util.RxBus.RxBus
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.PlaybackPreparer
@@ -53,7 +53,7 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
     val keyPosition = "position"
     val keyWindow = "window"
 
-    var video: Video? = null
+    lateinit var video: Video
     var url: String? = null
 
     //링크 공유 및 접속 시 필요한 query parameter.
@@ -68,8 +68,10 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_video)
         binding.activity = this
 
-        checkDeepLinkParameter()
-        getOffBus()
+        //딥링크로 들어왔는지 확인하고, 아닐 경우 bus 로 전송된 데이터 받음.
+        if (!checkDeepLinkParameter()) {
+            getOffBus()
+        }
 
         mediaDataSourceFactory = buildDataSourceFactory(true)
 
@@ -84,10 +86,7 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
     private fun initRecyclerView() {
 
         val adapter = TagAdapter().apply {
-
-            if (video != null) {
-                updateItems(getTagsByVideoId(realm, video?.id))
-            }
+            updateItems(getTagsByVideoId(realm, video.id))
 
             //태그 클릭 시 해당 지점으로 이동
             disposables.add(clickSubject.subscribe { data ->
@@ -100,8 +99,10 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
             })
         }
 
-        val layoutManager = LinearLayoutManager(this)
-        layoutManager.orientation = LinearLayoutManager.HORIZONTAL
+        val layoutManager = LinearLayoutManager(this).apply {
+            orientation = LinearLayoutManager.HORIZONTAL
+            isSmoothScrollbarEnabled = true
+        }
 
         binding.recyclerVideoTag.apply {
             this.layoutManager = layoutManager
@@ -112,24 +113,22 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
 
 
     /**
-     * 공유 된 비디오 url 이 있는지 확인.
+     * 사용자가 딥링크를 통해 들어온 경우, 링크에 담긴 정보를 추출함.
      */
     private fun checkDeepLinkParameter(): Boolean {
         val intent = intent
 
         //Manifest 에 등록한 action
         if (Intent.ACTION_VIEW == getIntent().action) {
-            val uri = intent.data
+            intent.data.apply {
+                // query 에서 비디오 URL 과 재생 지점 추출
+                val videoURL = getQueryParameter(sharedUrl)
+                val seekPoint = getQueryParameter(sharedPoint)
 
-            // query 에서 비디오 URL 과 재생 지점 추출
-            val videoURL = uri.getQueryParameter(sharedUrl)
-            val seekPoint = uri.getQueryParameter(sharedPoint)
-
-            if (videoURL != null) {
-                url = videoURL
-            }
-            if (seekPoint != null) {
-                startPosition = seekPoint.toLong()
+                if (videoURL != null && seekPoint != null) {
+                    url = videoURL
+                    startPosition = seekPoint.toLong() //영상의 시작 포지션을 설정해줌.
+                }
             }
             return true
         }
@@ -142,13 +141,10 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
      */
     private fun seekToTagPoint(point: Long) {
         player?.let {
-            if (point <= it.duration) {
-                player?.seekTo(point) //포인트로 이동.
-            } else {
-                player?.seekTo(it.duration) //더 크게 태그를 잡으면 영사의 마지막으로 이동.
-            }
+            if (point <= it.duration) player?.seekTo(point)
         }
     }
+
 
     /**
      * 메세지와 함께 URL 공유하는 메소드.
@@ -196,15 +192,15 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
 
     //버스에서 데이터 가져오기
     private fun getOffBus() {
-        val rxBus = RxBus.getInstance()
-
-        disposables.add(rxBus.toObservable()
-                .subscribe { data ->
-                    if (data is Video) {
-                        video = data
-                        url = data.url
-                    }
-                })
+       RxBus.getInstance().apply {
+            disposables.add(  toObservable()
+                    .subscribe { data ->
+                        if (data is Video) {
+                            video = data
+                            url = data.url
+                        }
+                    })
+        }
     }
 
     //기억된 시작 지점 가져오기
@@ -225,8 +221,7 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
 
     fun initPlayer() {
         if (player == null) {
-            val trackSelectionFactory = AdaptiveTrackSelection.Factory(bandWidthMeter)
-            trackSelector = DefaultTrackSelector(trackSelectionFactory)
+            trackSelector = DefaultTrackSelector(AdaptiveTrackSelection.Factory(bandWidthMeter))
 
             player = ExoPlayerFactory.newSimpleInstance(this, trackSelector)
                     .apply {
@@ -243,7 +238,7 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
             //apply 로 하면 에러남. 왜?
             binding.playerVideo.apply {
                 requestFocus()
-                this.player = this@VideoActivity.player
+                player = this@VideoActivity.player
                 setPlaybackPreparer(this@VideoActivity)
             }
         }
@@ -272,7 +267,7 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
                 .setTitle(getString(R.string.hint_input_tag))
                 .setView(editText)
                 .setPositiveButton(getString(R.string.dialog_ok), { _, _ ->
-                    addTagAsync(realm, player!!.currentPosition, editText.text.toString(), video?.id)
+                    addTagAsync(realm, player!!.currentPosition, editText.text.toString(), video.id)
                 })
                 .setNegativeButton(getString(R.string.dialog_cancel), null)
                 .create()

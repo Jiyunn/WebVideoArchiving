@@ -1,4 +1,4 @@
-package blog.cmcmcmcm.webvideoarchiving.view
+package blog.cmcmcmcm.webvideoarchiving.common.view
 
 import android.content.Context
 import android.support.design.widget.CoordinatorLayout
@@ -17,14 +17,12 @@ class WebFloatingBehavior(context: Context, attributeSet: AttributeSet) : Floati
     override fun onNestedScroll(coordinatorLayout: CoordinatorLayout, child: FloatingActionButton,
                                 target: View, dxConsumed: Int, dyConsumed: Int, dxUnconsumed: Int, dyUnconsumed: Int, type: Int) {
 
-       if (child.visibility == View.VISIBLE && dyConsumed > 0) {
-           child.hide()
-       } else if ( child.visibility == View.GONE && dyConsumed < 0) {
-           child.show()
-       }
+        if (child.visibility == View.VISIBLE && dyConsumed > 0) {
+            child.hide()
+        } else if (child.visibility == View.GONE && dyConsumed < 0) {
+            child.show()
+        }
     }
-
-
 
 
 }

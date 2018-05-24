@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import blog.cmcmcmcm.webvideoarchiving.R
-import blog.cmcmcmcm.webvideoarchiving.common.BaseRealmRecyclerViewAdapter
+import blog.cmcmcmcm.webvideoarchiving.common.adapter.BaseRealmRecyclerViewAdapter
 import blog.cmcmcmcm.webvideoarchiving.data.Tag
 import blog.cmcmcmcm.webvideoarchiving.databinding.ItemTagBinding
 import io.reactivex.Observable

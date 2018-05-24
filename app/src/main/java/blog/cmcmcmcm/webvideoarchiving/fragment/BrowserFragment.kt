@@ -10,11 +10,12 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import blog.cmcmcmcm.webvideoarchiving.R
 import blog.cmcmcmcm.webvideoarchiving.activity.MainActivity
+import blog.cmcmcmcm.webvideoarchiving.common.webkit.JyWebChromeClient
+import blog.cmcmcmcm.webvideoarchiving.common.webkit.JyWebClient
+import blog.cmcmcmcm.webvideoarchiving.common.webkit.WebScriptInterface
+import blog.cmcmcmcm.webvideoarchiving.common.webkit.WebViewScrollListener
 import blog.cmcmcmcm.webvideoarchiving.data.addVideoAsync
 import blog.cmcmcmcm.webvideoarchiving.databinding.FragmentBrowserBinding
-import blog.cmcmcmcm.webvideoarchiving.fragment.webkit.JyWebChromeClient
-import blog.cmcmcmcm.webvideoarchiving.fragment.webkit.JyWebClient
-import blog.cmcmcmcm.webvideoarchiving.fragment.webkit.WebScriptInterface
 import blog.cmcmcmcm.webvideoarchiving.util.hideSoftKeyboard
 import io.realm.Realm
 
@@ -116,17 +117,18 @@ class BrowserFragment : Fragment() {
             addJavascriptInterface(WebScriptInterface(binding.floatBrowserCollect), "App")
             loadUrl(getString(R.string.default_url))
 
-
-            //플로팅 버튼 숨김, 보임 설정
-            setOnScrollChangedCallback { _, t, _, oldt ->
-                if (t > oldt) {
-                    isFloatingNaviVisible = false
-                    isToolbarVisible = false
-                } else if (t < oldt) {
-                    isFloatingNaviVisible = true
-                    isToolbarVisible = true
+            setOnScrollChangedCallback(object : WebViewScrollListener {
+                //플로팅 버튼 숨김, 보임 설정
+                override fun onScroll(l: Int, t: Int, oldl: Int, oldt: Int) {
+                    if (t > oldt) {
+                        isFloatingNaviVisible = false
+                        isToolbarVisible = false
+                    } else if (t < oldt) {
+                        isFloatingNaviVisible = true
+                        isToolbarVisible = true
+                    }
                 }
-            }
+            })
         }
     }
 

@@ -19,13 +19,14 @@
         <android.support.design.widget.AppBarLayout
             android:layout_width = "match_parent"
             android:layout_height = "wrap_content"
+            android:orientation = "vertical"
             >
             
             <include
                 android:id = "@+id/toolbar"
                 layout = "@layout/toolbar_browser"
                 app:fragment = "@{fragment}"
-                app:layout_scrollFlags = "scroll|enterAlways"
+                app:layout_scrollFlags = "scroll|snap"
                 />
         
         </android.support.design.widget.AppBarLayout>
@@ -36,7 +37,7 @@
             app:layout_behavior = "@string/appbar_scrolling_view_behavior"
             >
             
-            <blog.cmcmcmcm.webvideoarchiving.view.CustomWebView
+            <blog.cmcmcmcm.webvideoarchiving.common.webkit.CustomWebView
                 android:id = "@+id/web"
                 android:layout_width = "match_parent"
                 android:layout_height = "match_parent"
@@ -55,7 +56,7 @@
                 android:layout_height = "wrap_content"
                 android:onClick = "@{fragment::onBrowserNavigateClick}"
                 android:src = "@drawable/ic_chevron_left_white_24dp"
-                app:layout_behavior = "blog.cmcmcmcm.webvideoarchiving.view.WebFloatingBehavior"
+                app:fabSize = "mini"
                 app:layout_constraintStart_toStartOf = "parent"
                 />
             
@@ -66,7 +67,7 @@
                 android:layout_height = "wrap_content"
                 android:onClick = "@{fragment::onBrowserNavigateClick}"
                 android:src = "@drawable/ic_chevron_right_white_24dp"
-                app:layout_behavior = "blog.cmcmcmcm.webvideoarchiving.view.WebFloatingBehavior"
+                app:fabSize = "mini"
                 app:layout_constraintStart_toEndOf = "@+id/float_browser_back"
                 />
             
