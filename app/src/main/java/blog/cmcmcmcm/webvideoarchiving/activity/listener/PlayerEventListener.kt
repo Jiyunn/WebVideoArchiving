@@ -1,19 +1,20 @@
 package blog.cmcmcmcm.webvideoarchiving.activity.listener
 
-import blog.cmcmcmcm.webvideoarchiving.activity.VideoActivity
+import blog.cmcmcmcm.webvideoarchiving.common.activity.BaseVideoActivity
 import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.source.BehindLiveWindowException
 import com.google.android.exoplayer2.ui.PlayerView
 
-class PlayerEventListener(val activity: VideoActivity, val playerView: PlayerView) : Player.DefaultEventListener() {
+class PlayerEventListener(val activity: BaseVideoActivity, val playerView: PlayerView) : Player.DefaultEventListener(), PlayerEvent {
+
 
     override fun onPlayerError(error: ExoPlaybackException?) {
         if (isBehindLiveWindow(error)) {
-            activity.clearStartPosition()
-            activity.initPlayer()
+            clearStartPosition()
+            initPlayer()
         } else {
-            activity.updateStartPosition()
+            updateStartPosition()
         }
     }
 
@@ -22,6 +23,7 @@ class PlayerEventListener(val activity: VideoActivity, val playerView: PlayerVie
             return false
         }
         var cause: Throwable? = error.sourceException
+
         while (cause != null) {
             if (cause is BehindLiveWindowException) {
                 return true
@@ -32,11 +34,24 @@ class PlayerEventListener(val activity: VideoActivity, val playerView: PlayerVie
     }
 
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-        activity.updateStartPosition()
+        updateStartPosition()
 
         if (playbackState == Player.STATE_READY) {
             playerView.hideController()
         }
     }
+
+    override fun clearStartPosition() {
+        activity.clearStartPosition()
+    }
+
+    override fun initPlayer() {
+        activity.initPlayer()
+    }
+
+    override fun updateStartPosition() {
+        activity.updateStartPosition()
+    }
+
 
 }

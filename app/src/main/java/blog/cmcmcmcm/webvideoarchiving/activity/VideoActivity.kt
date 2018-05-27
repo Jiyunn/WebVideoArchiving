@@ -6,12 +6,12 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.widget.EditText
 import blog.cmcmcmcm.webvideoarchiving.ArchivingApplication
 import blog.cmcmcmcm.webvideoarchiving.R
 import blog.cmcmcmcm.webvideoarchiving.activity.listener.PlayerEventListener
+import blog.cmcmcmcm.webvideoarchiving.common.activity.BaseVideoActivity
 import blog.cmcmcmcm.webvideoarchiving.common.rx.RxBus
 import blog.cmcmcmcm.webvideoarchiving.data.Video
 import blog.cmcmcmcm.webvideoarchiving.data.addTagAsync
@@ -36,7 +36,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import java.net.URLEncoder
 
-class VideoActivity : AppCompatActivity(), PlaybackPreparer {
+class VideoActivity : BaseVideoActivity(), PlaybackPreparer {
 
     lateinit var binding: ActivityVideoBinding
     var realm: Realm = Realm.getDefaultInstance()
@@ -192,8 +192,8 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
 
     //버스에서 데이터 가져오기
     private fun getOffBus() {
-       RxBus.getInstance().apply {
-            disposables.add(  toObservable()
+        RxBus.getInstance().apply {
+            disposables.add(toObservable()
                     .subscribe { data ->
                         if (data is Video) {
                             video = data
@@ -212,14 +212,14 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
     }
 
     //시작 지점 업데이트.
-    fun updateStartPosition() {
+    override fun updateStartPosition() {
         player?.let {
             startPosition = Math.max(0, it.currentPosition)
         }
     }
 
 
-    fun initPlayer() {
+    override fun initPlayer() {
         if (player == null) {
             trackSelector = DefaultTrackSelector(AdaptiveTrackSelection.Factory(bandWidthMeter))
 
@@ -255,7 +255,9 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
     }
 
     private fun releasePlayer() {
-        player?.release()
+        player?.let {
+            it.release()
+        }
         player = null
     }
 
@@ -283,7 +285,6 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
     }
 
     private fun releaseResources() {
-        releasePlayer()
         disposables.dispose()
         realm.close()
     }
@@ -295,11 +296,9 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
 
     override fun onStart() {
         super.onStart()
+
         if (Util.SDK_INT > 23) {
             initPlayer()
-        }
-        if (realm.isClosed) {
-            realm = Realm.getDefaultInstance()
         }
         initRecyclerView()
     }
@@ -318,7 +317,13 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer {
         }
     }
 
-    fun clearStartPosition() {
+    override fun onBackPressed() {
+        releaseResources()
+
+        super.onBackPressed()
+    }
+
+    override fun clearStartPosition() {
         startWindow = C.INDEX_UNSET
         startPosition = C.TIME_UNSET
     }

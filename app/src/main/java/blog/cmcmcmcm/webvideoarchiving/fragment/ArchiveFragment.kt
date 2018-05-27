@@ -31,20 +31,18 @@ class ArchiveFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_archive, container, false)
-
         return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         initToolbar()
     }
 
-    override fun onStart() {
-        super.onStart()
 
-        //비디오 액티비티에서 다시 돌아올 때, 정상작동을 위해 여기서 초기화.
+    override fun onResume() {
+        super.onResume()
+
         if (realm.isClosed) {
             realm = Realm.getDefaultInstance()
         }
@@ -58,7 +56,8 @@ class ArchiveFragment : Fragment() {
     //initialize recycler view
     private fun initRecyclerView() {
         val adapter = ArchiveAdapter(activity).apply {
-            updateItems(realm.where<Video>().sort(Video::addedDate.name, Sort.DESCENDING).findAll())
+            updateItems(realm.where<Video>()
+                    .sort(Video::addedDate.name, Sort.DESCENDING).findAll())
 
             disposables.add(clickSubject
                     .subscribe { data ->
@@ -85,6 +84,7 @@ class ArchiveFragment : Fragment() {
                 override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
                     //첫번째로 보이는 아이템의 포지션 얻기
                     val firstPosition = layoutManager.findFirstVisibleItemPosition()
+                    val lastPosition = layoutManager.findLastVisibleItemPosition()
 
                     val globalVisibleRect = Rect()
                     val itemVisibleRect = Rect()
@@ -103,14 +103,14 @@ class ArchiveFragment : Fragment() {
                                     Math.min(visibleHeight.toFloat() / view.height, 1f)
                                 }
 
-                        val viewHolder =
+                        val firstViewHolder =
                                 binding.recyclerArchive.findViewHolderForAdapterPosition(firstPosition) as ArchiveAdapter.ArchiveViewHolder
 
                         //90%이상 보이면 재생, 그렇지 않으면 멈춤.
                         if (visiblePercent >= 0.9f) {
-                            viewHolder.play()
+                            firstViewHolder.play()
                         } else {
-                            viewHolder.stop()
+                            firstViewHolder.stop()
                         }
                     }
                 }
@@ -124,12 +124,14 @@ class ArchiveFragment : Fragment() {
         realm.close()
     }
 
+
     override fun onStop() {
         super.onStop()
 
         releaseResources()
     }
 
+    //비디오 액티비티에 진입할 때 onDestroyView, onDestroy 는 호출되지 않음.
     override fun onDestroy() {
         super.onDestroy()
 

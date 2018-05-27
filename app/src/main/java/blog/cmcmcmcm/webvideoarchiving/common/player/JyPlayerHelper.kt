@@ -3,8 +3,10 @@ package blog.cmcmcmcm.webvideoarchiving.common.player
 import android.content.Context
 import android.media.session.PlaybackState
 import android.net.Uri
+import android.util.Log
 import blog.cmcmcmcm.webvideoarchiving.data.Video
 import com.google.android.exoplayer2.ExoPlayerFactory
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
@@ -17,7 +19,7 @@ import com.google.android.exoplayer2.util.Util
 
 class JyPlayerHelper(val context: Context?,
                      val video: Video,
-                     val playView: PlayerView?) {
+                     playView: PlayerView?) {
 
 
     val videoTrackSelection = AdaptiveTrackSelection.Factory(DefaultBandwidthMeter()) //비디오 트랙셀렉션
@@ -46,6 +48,7 @@ class JyPlayerHelper(val context: Context?,
     //재생 준비
     fun preparePlayer() {
         player?.let {
+            Log.d("PlayVideo", "prepare player")
             it.prepare(getMediaSource(video.url))
             it.seekTo(video.seeingPoint)
         }
@@ -53,16 +56,22 @@ class JyPlayerHelper(val context: Context?,
 
     //비디오 플레이하기.
     fun playVideo() {
-        if (player?.playbackState == PlaybackState.STATE_PLAYING) {
+        Log.d("PlayVideo", "state ${player?.playbackState}")
+        if (player?.playbackState == Player.STATE_READY) {
+            Log.d("PlayVideo", "State is ready, play video")
             player?.playWhenReady = true
         }
     }
 
     fun stopPlayer() {
-        player?.stop()
+        Log.d("PlayVideo", "stop player, current state ${player?.playbackState}")
+        if (player?.playbackState != PlaybackState.STATE_PAUSED) {
+            player?.playWhenReady = false
+        }
     }
 
     fun releasePlayer() {
+        Log.d("PlayVideo", "release player")
         player?.release()
         player = null
     }
