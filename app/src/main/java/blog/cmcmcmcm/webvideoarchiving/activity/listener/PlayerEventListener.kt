@@ -6,7 +6,8 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.source.BehindLiveWindowException
 import com.google.android.exoplayer2.ui.PlayerView
 
-class PlayerEventListener(val activity: BaseVideoActivity, val playerView: PlayerView) : Player.DefaultEventListener(), PlayerEvent {
+class PlayerEventListener(val activity: BaseVideoActivity,
+                          val playerView: PlayerView) : Player.DefaultEventListener(), PlayerEvent {
 
 
     override fun onPlayerError(error: ExoPlaybackException?) {

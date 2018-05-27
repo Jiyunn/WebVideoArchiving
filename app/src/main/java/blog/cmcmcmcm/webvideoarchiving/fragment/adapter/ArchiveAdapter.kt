@@ -50,7 +50,7 @@ class ArchiveAdapter(val context: Context?) : BaseRealmRecyclerViewAdapter<Video
     class ArchiveViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), JyPlayer {
 
         val binding: ItemArchiveBinding? = DataBindingUtil.bind(itemView)
-        var playerHelper: JyPlayerHelper? = null
+        private var playerHelper: JyPlayerHelper? = null
 
         //initialize player
         fun initPlayer(video: Video, context: Context?) {

@@ -22,9 +22,9 @@ class JyPlayerHelper(val context: Context?,
                      playView: PlayerView?) {
 
 
-    val videoTrackSelection = AdaptiveTrackSelection.Factory(DefaultBandwidthMeter()) //비디오 트랙셀렉션
-    val trackSelector = DefaultTrackSelector(videoTrackSelection) //트랙셀렉터
-    var player: SimpleExoPlayer?
+    private val videoTrackSelection = AdaptiveTrackSelection.Factory(DefaultBandwidthMeter()) //비디오 트랙셀렉션
+    private val trackSelector = DefaultTrackSelector(videoTrackSelection) //트랙셀렉터
+    private var player: SimpleExoPlayer?
 
     init {
         player = ExoPlayerFactory.newSimpleInstance(context, trackSelector) //플레이어 설정

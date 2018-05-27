@@ -39,28 +39,28 @@ import java.net.URLEncoder
 class VideoActivity : BaseVideoActivity(), PlaybackPreparer {
 
     lateinit var binding: ActivityVideoBinding
-    var realm: Realm = Realm.getDefaultInstance()
+     var realm: Realm = Realm.getDefaultInstance()
 
-    var player: SimpleExoPlayer? = null
-    val bandWidthMeter = DefaultBandwidthMeter()
-    lateinit var mediaDataSourceFactory: DataSource.Factory
+    private var player: SimpleExoPlayer? = null
+    private val bandWidthMeter = DefaultBandwidthMeter()
+    private lateinit var mediaDataSourceFactory: DataSource.Factory
 
-    lateinit var trackSelector: DefaultTrackSelector
+    private lateinit var trackSelector: DefaultTrackSelector
 
-    var startPosition: Long = 0L
-    var startWindow: Int = 0
+    private var startPosition: Long = 0L
+    private var startWindow: Int = 0
 
-    val keyPosition = "position"
-    val keyWindow = "window"
+    private val keyPosition = "position"
+    private val keyWindow = "window"
 
-    lateinit var video: Video
-    var url: String? = null
+    private lateinit var video: Video
+    private var url: String? = null
 
     //링크 공유 및 접속 시 필요한 query parameter.
-    val sharedUrl = "video_url"
-    val sharedPoint = "seek_point"
+    private val sharedUrl = "video_url"
+    private val sharedPoint = "seek_point"
 
-    val disposables: CompositeDisposable = CompositeDisposable()
+    private val disposables: CompositeDisposable = CompositeDisposable()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -283,7 +283,7 @@ class VideoActivity : BaseVideoActivity(), PlaybackPreparer {
     }
 
     private fun releaseResources() {
-        disposables.dispose()
+        disposables.clear()
         realm.close()
     }
 

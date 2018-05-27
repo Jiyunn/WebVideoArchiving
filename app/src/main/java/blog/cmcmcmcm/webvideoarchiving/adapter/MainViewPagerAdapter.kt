@@ -10,7 +10,7 @@ import blog.cmcmcmcm.webvideoarchiving.fragment.BrowserFragment
 
 class MainViewPagerAdapter(fm: FragmentManager, context: Context?) : FragmentPagerAdapter(fm) {
 
-    val tabTitles = arrayOf(context?.getString(R.string.tab_browser), context?.getString(R.string.tab_archive))
+    private val tabTitles = arrayOf(context?.getString(R.string.tab_browser), context?.getString(R.string.tab_archive))
 
     override fun getItem(position: Int): Fragment {
 

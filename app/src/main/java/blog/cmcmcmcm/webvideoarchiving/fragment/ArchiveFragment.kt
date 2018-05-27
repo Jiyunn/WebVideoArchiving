@@ -27,7 +27,7 @@ class ArchiveFragment : Fragment() {
     lateinit var binding: FragmentArchiveBinding
     var realm: Realm = Realm.getDefaultInstance()
 
-    val disposables: CompositeDisposable = CompositeDisposable()
+    private val disposables: CompositeDisposable = CompositeDisposable()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_archive, container, false)
