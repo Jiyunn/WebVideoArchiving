@@ -84,7 +84,6 @@ class ArchiveFragment : Fragment() {
                 override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
                     //첫번째로 보이는 아이템의 포지션 얻기
                     val firstPosition = layoutManager.findFirstVisibleItemPosition()
-                    val lastPosition = layoutManager.findLastVisibleItemPosition()
 
                     val globalVisibleRect = Rect()
                     val itemVisibleRect = Rect()

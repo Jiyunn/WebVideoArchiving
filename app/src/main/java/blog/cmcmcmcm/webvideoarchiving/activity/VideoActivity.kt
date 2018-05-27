@@ -235,7 +235,7 @@ class VideoActivity : BaseVideoActivity(), PlaybackPreparer {
                         prepare(buildMediaSource(url), !haveStartPosition, false)
                     }
 
-            //apply 로 하면 에러남. 왜?
+            //this@를 붙여줄 것.
             binding.playerVideo.apply {
                 requestFocus()
                 player = this@VideoActivity.player
@@ -255,9 +255,7 @@ class VideoActivity : BaseVideoActivity(), PlaybackPreparer {
     }
 
     private fun releasePlayer() {
-        player?.let {
-            it.release()
-        }
+        player?.release()
         player = null
     }
 
