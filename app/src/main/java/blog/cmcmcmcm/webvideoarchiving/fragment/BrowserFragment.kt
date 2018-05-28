@@ -22,7 +22,7 @@ import io.realm.Realm
 class BrowserFragment : Fragment() {
 
     lateinit var binding: FragmentBrowserBinding
-    val realm: Realm = Realm.getDefaultInstance()
+    var realm: Realm = Realm.getDefaultInstance()
 
     var videoURL: String? = null
 
@@ -153,6 +153,14 @@ class BrowserFragment : Fragment() {
                     binding.web.goForward()
                 }
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (realm.isClosed) {
+            realm = Realm.getDefaultInstance()
         }
     }
 

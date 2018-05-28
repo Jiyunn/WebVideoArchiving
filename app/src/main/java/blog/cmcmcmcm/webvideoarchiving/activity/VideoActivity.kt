@@ -6,12 +6,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.widget.EditText
 import blog.cmcmcmcm.webvideoarchiving.ArchivingApplication
 import blog.cmcmcmcm.webvideoarchiving.R
+import blog.cmcmcmcm.webvideoarchiving.activity.listener.PlayerEvent
 import blog.cmcmcmcm.webvideoarchiving.activity.listener.PlayerEventListener
-import blog.cmcmcmcm.webvideoarchiving.common.activity.BaseVideoActivity
 import blog.cmcmcmcm.webvideoarchiving.common.rx.RxBus
 import blog.cmcmcmcm.webvideoarchiving.data.Video
 import blog.cmcmcmcm.webvideoarchiving.data.addTagAsync
@@ -36,7 +37,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import java.net.URLEncoder
 
-class VideoActivity : BaseVideoActivity(), PlaybackPreparer {
+class VideoActivity : AppCompatActivity(), PlaybackPreparer, PlayerEvent {
 
     lateinit var binding: ActivityVideoBinding
      var realm: Realm = Realm.getDefaultInstance()
