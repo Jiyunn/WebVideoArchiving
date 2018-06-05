@@ -1,7 +1,6 @@
 package blog.cmcmcmcm.webvideoarchiving.common.player
 
 import android.content.Context
-import android.media.session.PlaybackState
 import android.net.Uri
 import blog.cmcmcmcm.webvideoarchiving.data.Video
 import com.google.android.exoplayer2.ExoPlayerFactory
@@ -54,13 +53,14 @@ class JyPlayerHelper(val context: Context?,
 
     //비디오 플레이하기.
     fun playVideo() {
+        //playWhenReady가 true이고 playbackState가 Ready일 때 플레이어는 재생 중임.
         if (player?.playWhenReady ==false && player?.playbackState == Player.STATE_READY) {
             player?.playWhenReady = true
         }
     }
 
     fun stopPlayer() {
-        if (player?.playWhenReady ==true && player?.playbackState != PlaybackState.STATE_PAUSED) {
+        if (player?.playWhenReady ==true && player?.playbackState == Player.STATE_READY) {
             player?.playWhenReady = false
         }
     }
