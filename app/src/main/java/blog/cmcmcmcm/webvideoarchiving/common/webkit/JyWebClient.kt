@@ -7,16 +7,15 @@ import android.util.Base64
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import blog.cmcmcmcm.webvideoarchiving.fragment.BrowserFragment
 import java.io.InputStream
 
-class JyWebClient(val context: BrowserFragment ) : WebViewClient() {
+class JyWebClient(val helper:WebClientHelper ) : WebViewClient() {
 
     override fun onPageFinished(view: WebView?, url: String?) {
         super.onPageFinished(view, url)
 
         injectScriptFile(view, "js/script.js")
-        context.binding.toolbar?.editToolbarBrowser?.setText(view?.url.toString()) //url 텍스트 설정해줌.
+        helper.setURLTextInToolbar(view?.url.toString()) //url 텍스트 설정해줌.
         view?.requestFocus()
     }
 
@@ -25,10 +24,10 @@ class JyWebClient(val context: BrowserFragment ) : WebViewClient() {
         url?.let {
             //광고를 제외한 비디오
             if (it.contains(".mp4") && !it.contains("/video/")) {
-                context.videoURL = url //비디오 url
+                helper.videoURL = url //비디오 url
 
-                if (!context.isFloatingCollectVisible) { //플로팅 버튼이 안보일 때.
-                    context.isFloatingCollectVisible = true
+                if (!helper.isFloatingCollectVisible) { //플로팅 버튼이 안보일 때.
+                    helper.isFloatingCollectVisible = true
                 }
             }
         }
@@ -39,8 +38,8 @@ class JyWebClient(val context: BrowserFragment ) : WebViewClient() {
         super.onPageStarted(view, url, favicon)
         view?.requestFocus()
 
-        if (context.isFloatingCollectVisible) { //플로팅 버튼이 보일 때
-            context.isFloatingCollectVisible = false
+        if (helper.isFloatingCollectVisible) { //플로팅 버튼이 보일 때
+            helper.isFloatingCollectVisible = false
         }
     }
 

@@ -10,23 +10,21 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import blog.cmcmcmcm.webvideoarchiving.R
 import blog.cmcmcmcm.webvideoarchiving.activity.MainActivity
-import blog.cmcmcmcm.webvideoarchiving.common.webkit.JyWebChromeClient
-import blog.cmcmcmcm.webvideoarchiving.common.webkit.JyWebClient
-import blog.cmcmcmcm.webvideoarchiving.common.webkit.WebScriptInterface
-import blog.cmcmcmcm.webvideoarchiving.common.webkit.WebViewScrollListener
+import blog.cmcmcmcm.webvideoarchiving.common.webkit.*
 import blog.cmcmcmcm.webvideoarchiving.data.addVideoAsync
 import blog.cmcmcmcm.webvideoarchiving.databinding.FragmentBrowserBinding
 import blog.cmcmcmcm.webvideoarchiving.util.hideSoftKeyboard
 import io.realm.Realm
 
-class BrowserFragment : Fragment() {
+class BrowserFragment : Fragment(), WebClientHelper {
 
     lateinit var binding: FragmentBrowserBinding
     var realm: Realm = Realm.getDefaultInstance()
 
-    var videoURL: String? = null
+    override var videoURL: String?=null
 
-    var isFloatingCollectVisible = false
+    override var isFloatingCollectVisible: Boolean
+        get() = false
         set (visibility) {
             if (visibility) {
                 binding.floatBrowserCollect.show()
@@ -154,6 +152,10 @@ class BrowserFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun setURLTextInToolbar(text:String) {
+        binding.toolbar?.editToolbarBrowser?.setText(text)
     }
 
     override fun onResume() {
