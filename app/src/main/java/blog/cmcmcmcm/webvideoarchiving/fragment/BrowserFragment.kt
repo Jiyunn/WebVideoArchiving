@@ -21,7 +21,7 @@ class BrowserFragment : Fragment(), WebClientHelper {
     lateinit var binding: FragmentBrowserBinding
     var realm: Realm = Realm.getDefaultInstance()
 
-    override var videoURL: String?=null
+    override var videoURL: String? = null
 
     override var isFloatingCollectVisible: Boolean
         get() = false
@@ -80,7 +80,6 @@ class BrowserFragment : Fragment(), WebClientHelper {
                 }
                 true
             }
-
             //새로고침
             imgBtnRefresh.setOnClickListener {
                 binding.web.reload()
@@ -154,7 +153,7 @@ class BrowserFragment : Fragment(), WebClientHelper {
         }
     }
 
-    override fun setURLTextInToolbar(text:String) {
+    override fun setURLTextInToolbar(text: String) {
         binding.toolbar?.editToolbarBrowser?.setText(text)
     }
 
