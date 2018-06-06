@@ -120,6 +120,7 @@ class ArchiveFragment : Fragment() {
     private fun releaseResources() {
         binding.recyclerArchive.adapter = null
         realm.close()
+        disposables.clear()
     }
 
 
@@ -134,6 +135,5 @@ class ArchiveFragment : Fragment() {
         super.onDestroy()
 
         releaseResources()
-        disposables.dispose()
     }
 }
