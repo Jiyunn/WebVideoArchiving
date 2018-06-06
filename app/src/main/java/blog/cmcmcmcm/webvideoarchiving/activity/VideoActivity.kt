@@ -40,7 +40,7 @@ import java.net.URLEncoder
 class VideoActivity : AppCompatActivity(), PlaybackPreparer, PlayerEvent {
 
     lateinit var binding: ActivityVideoBinding
-     var realm: Realm = Realm.getDefaultInstance()
+    var realm: Realm = Realm.getDefaultInstance()
 
     private var player: SimpleExoPlayer? = null
     private val bandWidthMeter = DefaultBandwidthMeter()
@@ -54,8 +54,8 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer, PlayerEvent {
     private val keyPosition = "position"
     private val keyWindow = "window"
 
-    private lateinit var video: Video
     private var url: String? = null
+    private var videoId: String? = null
 
     //링크 공유 및 접속 시 필요한 query parameter.
     private val sharedUrl = "video_url"
@@ -69,11 +69,6 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer, PlayerEvent {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_video)
         binding.activity = this
 
-        //딥링크로 들어왔는지 확인하고, 아닐 경우 bus 로 전송된 데이터 받음.
-        if (!checkDeepLinkParameter()) {
-            getOffBus()
-        }
-
         mediaDataSourceFactory = buildDataSourceFactory(true)
 
         //재생하다 종료 된 지점이 있는지 찾기
@@ -81,13 +76,17 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer, PlayerEvent {
             startPosition = it.getLong(keyPosition)
             startWindow = it.getInt(keyWindow)
         }
-    }
 
+        //딥링크로 들어왔는지 확인하고, 아닐 경우 bus 로 전송된 데이터 받음.
+        if (!checkDeepLinkParameter() && url==null) {
+            getOffBus()
+        }
+    }
 
     private fun initRecyclerView() {
 
         val adapter = TagAdapter().apply {
-            updateItems(getTagsByVideoId(realm, video.id))
+            updateItems(getTagsByVideoId(realm, videoId))
 
             //태그 클릭 시 해당 지점으로 이동
             disposables.add(clickSubject.subscribe { data ->
@@ -197,19 +196,22 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer, PlayerEvent {
             disposables.add(toObservable()
                     .subscribe { data ->
                         if (data is Video) {
-                            video = data
+                            videoId = data.id
                             url = data.url
                         }
                     })
         }
     }
 
-    //기억된 시작 지점 가져오기
+
+    //지점 정하기
     override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
         updateStartPosition()
 
-        outState?.putLong(keyPosition, startPosition)
-        outState?.putInt(keyWindow, startWindow)
+        outState?.apply {
+            putLong(keyPosition, startPosition)
+            putInt(keyWindow, startWindow)
+        }
     }
 
     //시작 지점 업데이트.
@@ -268,7 +270,7 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer, PlayerEvent {
                 .setTitle(getString(R.string.hint_input_tag))
                 .setView(editText)
                 .setPositiveButton(getString(R.string.dialog_ok), { _, _ ->
-                    addTagAsync(realm, player!!.currentPosition, editText.text.toString(), video.id)
+                    addTagAsync(realm, player!!.currentPosition, editText.text.toString(), videoId)
                 })
                 .setNegativeButton(getString(R.string.dialog_cancel), null)
                 .create()
@@ -281,15 +283,19 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer, PlayerEvent {
         if (Util.SDK_INT <= 23 || player == null) {
             initPlayer()
         }
+        initRecyclerView()
     }
 
     private fun releaseResources() {
-        disposables.clear()
-        realm.close()
+        disposables.dispose()
+        if (!realm.isClosed) {
+            realm.close()
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+
         releaseResources()
     }
 
@@ -298,8 +304,10 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer, PlayerEvent {
 
         if (Util.SDK_INT > 23) {
             initPlayer()
+            if (realm.isClosed) {
+                realm = Realm.getDefaultInstance()
+            }
         }
-        initRecyclerView()
     }
 
     override fun onPause() {
@@ -311,8 +319,9 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer, PlayerEvent {
 
     override fun onStop() {
         super.onStop()
+
         if (Util.SDK_INT > 23) {
-            releasePlayer()
+            releaseResources()
         }
     }
 

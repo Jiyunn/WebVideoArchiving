@@ -42,7 +42,7 @@ class ArchiveFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-
+  
         if (realm.isClosed) {
             realm = Realm.getDefaultInstance()
         }
@@ -119,7 +119,6 @@ class ArchiveFragment : Fragment() {
 
     private fun releaseResources() {
         binding.recyclerArchive.adapter = null
-        disposables.clear()
         realm.close()
     }
 
@@ -135,5 +134,6 @@ class ArchiveFragment : Fragment() {
         super.onDestroy()
 
         releaseResources()
+        disposables.dispose()
     }
 }
