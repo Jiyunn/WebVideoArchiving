@@ -78,7 +78,7 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer, PlayerEvent {
         }
 
         //딥링크로 들어왔는지 확인하고, 아닐 경우 bus 로 전송된 데이터 받음.
-        if (!checkDeepLinkParameter() && url==null) {
+        if (!checkDeepLinkParameter() && url == null) {
             getOffBus()
         }
     }
@@ -295,7 +295,7 @@ class VideoActivity : AppCompatActivity(), PlaybackPreparer, PlayerEvent {
 
     override fun onDestroy() {
         super.onDestroy()
-
+        releasePlayer()
         releaseResources()
     }
 
