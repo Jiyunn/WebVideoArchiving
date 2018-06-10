@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,6 +32,7 @@ class ArchiveFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_archive, container, false)
+        
         return binding.root
     }
 
@@ -42,6 +44,7 @@ class ArchiveFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        Log.d("Life", "onResume")
   
         if (realm.isClosed) {
             realm = Realm.getDefaultInstance()
@@ -124,8 +127,9 @@ class ArchiveFragment : Fragment() {
     }
 
 
-    override fun onStop() {
-        super.onStop()
+    override fun onPause() {
+        super.onPause()
+
 
         releaseResources()
     }
